@@ -1,10 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
+#include <pybind11/detail/common.h>
 
 namespace py = pybind11;
 
 #include <colmap/base/pose.h>
+#include <colmap/util/version.h>
 
 #include "estimators/absolute_pose.cc"
 #include "estimators/generalized_absolute_pose.cc"
@@ -31,6 +33,12 @@ PYBIND11_MODULE(pycolmap, m) {
 #else
     m.attr("__version__") = py::str("dev");
 #endif
+    m.attr("__pybind_version__") = py::str(
+            std::to_string(PYBIND11_VERSION_MAJOR) + "."
+            + std::to_string(PYBIND11_VERSION_MINOR) + "."
+            + std::to_string(PYBIND11_VERSION_PATCH));
+    m.attr("__colmap_version__") = py::str(colmap::GetVersionInfo());
+    m.attr("__colmap_commit__") = py::str(colmap::GetBuildInfo());
 
     // Estimators
     auto PyRANSACOptions = py::class_<RANSACOptions>(m, "RANSACOptions")
