@@ -112,16 +112,6 @@ std::map<size_t, Reconstruction> incremental_mapping(
         database_path_, image_path_, output_path_, options);
 }
 
-struct IncrementalMapperOptions_ : IncrementalMapperOptions {
-    inline IncrementalMapper::Options GetMapper() const {
-        return mapper;
-    }
-
-    inline IncrementalMapper::Options SetMapper(const IncrementalMapper::Options& options) {
-        mapper = options;
-    }
-}
-
 void init_sfm(py::module& m) {
     init_images(m);
     init_extract_features(m);
@@ -135,7 +125,7 @@ void init_sfm(py::module& m) {
             .def_readwrite("abs_pose_min_inlier_ratio", &IncrementalMapper::Options::abs_pose_min_inlier_ratio);
     make_dataclass(PyIncrementalMapperInternalOptions);
 
-    using Opts = IncrementalMapperOptions_;
+    using Opts = IncrementalMapperOptions;
     auto PyIncrementalMapperOptions =
         py::class_<Opts>(m, "IncrementalMapperOptions")
             .def(py::init<>())
@@ -195,7 +185,7 @@ void init_sfm(py::module& m) {
             .def_readwrite("snapshot_images_freq", &Opts::snapshot_images_freq)
             .def_readwrite("image_names", &Opts::image_names)
             .def_readwrite("fix_existing_images", &Opts::fix_existing_images)
-            .def_property("internal_options", &Opts::GetMapper, &Opts::SetMapper);
+            .def_readwrite("mapper", &Opts::mapper);
     make_dataclass(PyIncrementalMapperOptions);
     auto mapper_options = PyIncrementalMapperOptions().cast<Opts>();
 
